@@ -34,10 +34,22 @@ public class HoneyXp extends JavaPlugin implements Listener {
 			e.getClickedBlock().getType() == Material.LIGHTNING_ROD && 
 			e.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.LAPIS_BLOCK
 		) {
-			if (e.getItem().getType() == Material.HONEY_BOTTLE && !(e.getItem().hasItemMeta() || e.getItem().getItemMeta().hasLore())) {
+			if (e.getItem().getType() == Material.HONEY_BOTTLE) {
 				ExperienceManager expMan = new ExperienceManager(e.getPlayer());
-				if (e.getPlayer().hasPermission("honeyxp.bottle") && expMan.hasExp(7)) {
-					expMan.changeExp(-7);
+				if (e.getPlayer().hasPermission("honeyxp.bottle")) {
+					int points = 7;
+					int onPoints = 0;
+					if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasLore()) {
+						try {
+							onPoints = Integer.parseInt(e.getItem().getItemMeta().getLore().get(0).split(": ")[1]);
+							points = expMan.getXpNeededToLevelUp(expMan.getLevelForExp(onPoints) + 1);
+							if (points > 36) { // don't go further than 21 levels (from 0) stored in a bottle.
+								e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_LAVA_POP, 1.0f, 1.0f);
+								return;
+							}
+						} catch (Exception ex) { ex.printStackTrace();}
+					}
+					expMan.changeExp(-points);
 					ItemStack hb = e.getItem();
 					ItemStack newB = hb.clone();
 					// Remove one normal honey bottle.
@@ -45,7 +57,7 @@ public class HoneyXp extends JavaPlugin implements Listener {
 					// Prepare new Honey Xp Bottle
 					newB.setAmount(1);
 					ItemMeta m = newB.getItemMeta();
-					m.setLore(Arrays.asList("Stored XP: 7")); //TODO add more level possibility?
+					m.setLore(Arrays.asList("Stored XP: " + (onPoints + points)));
 					m.setDisplayName(ChatColor.RESET + "Honey Xp Bottle");
 					// Add item glow effect.
 					NamespacedKey key = new NamespacedKey(this, getDescription().getName());
@@ -57,9 +69,9 @@ public class HoneyXp extends JavaPlugin implements Listener {
 					e.getPlayer().getInventory().addItem(newB);
 					e.getPlayer().updateInventory();
 					e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, 1.0f, 1.0f);
-				} else {
-					e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_LAVA_POP, 1.0f, 1.0f);
+					return;
 				}
+				e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_LAVA_POP, 1.0f, 1.0f);
 			}
 		}
 	}
@@ -74,7 +86,7 @@ public class HoneyXp extends JavaPlugin implements Listener {
 						int points = Integer.parseInt(e.getItem().getItemMeta().getLore().get(0).split(": ")[1]);
 						expMan.changeExp(points);
 						e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1.0f, 1.0f);
-					} catch (Exception ex) { ex.printStackTrace();}
+					} catch (Exception ex) { ex.printStackTrace(); }
 				} else {
 					e.getPlayer().getWorld().playSound(e.getPlayer(), Sound.BLOCK_LAVA_POP, 1.0f, 1.0f);
 					e.setCancelled(true);
