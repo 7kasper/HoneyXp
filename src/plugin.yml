@@ -1,0 +1,18 @@
+name: HoneyXp
+main: nl.kaspermuller.honeyxp.HoneyXp
+description: Simple plugin to bottle xp into honey.
+version: 0.1
+api-version: 1.18
+author: 7kasper
+permissions:
+  honeyxp.*:
+    description: Gives access to all honeyxp permissions.
+    children:
+       honeyxp.drink: true
+       honeyxp.bottle: true
+  honeyxp.bottle:
+    description: Allows you to bottle your xp.
+    default: true
+  honeyxp.drink:
+    description: Allows you to drink xp.
+    default: true
