@@ -1,11 +1,9 @@
 package nl.kaspermuller.honeyxp;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -14,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,7 +22,6 @@ public class HoneyXp extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
-		registerGlow();
 		getServer().getConsoleSender().sendMessage("Enabled §6HoneyXp§r plugin :D");
 	}
 	
@@ -59,11 +57,9 @@ public class HoneyXp extends JavaPlugin implements Listener {
 					ItemMeta m = newB.getItemMeta();
 					m.setLore(Arrays.asList("Stored XP: " + (onPoints + points)));
 					m.setDisplayName(ChatColor.RESET + "Honey Xp Bottle");
-					// Add item glow effect.
-					NamespacedKey key = new NamespacedKey(this, getDescription().getName());
-					GlowEnchant glow = new GlowEnchant(key);
-					m.addEnchant(glow, 1, true);
-//					m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+					// TODO no hack? For now we just add random enchantment and remove its visisbility:
+					m.addEnchant(Enchantment.THORNS, 1, true);
+					m.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 					// Give the item.
 					newB.setItemMeta(m);
 					e.getPlayer().getInventory().addItem(newB);
@@ -94,28 +90,5 @@ public class HoneyXp extends JavaPlugin implements Listener {
 			}
 		}
 	}
-	
-	// UTIL
-    public void registerGlow() {
-        try {
-            Field f = Enchantment.class.getDeclaredField("acceptingNew");
-            f.setAccessible(true);
-            f.set(null, true);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-         NamespacedKey key = new NamespacedKey(this, getDescription().getName());
-           
-            GlowEnchant glow = new GlowEnchant(key);
-            Enchantment.registerEnchantment(glow);
-        }
-        catch (IllegalArgumentException e){
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-    }
 
 }
