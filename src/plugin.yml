@@ -1,7 +1,7 @@
 name: HoneyXp
 main: nl.kaspermuller.honeyxp.HoneyXp
 description: Simple plugin to bottle xp into honey.
-version: 0.2
+version: 0.3
 api-version: 1.20
 author: 7kasper
 permissions:
